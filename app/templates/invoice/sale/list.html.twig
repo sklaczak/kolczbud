@@ -42,7 +42,7 @@
                     {% for invoice in invoices %}
                         <tr>
                             <td>{{ invoice.number }}</td>
-                            <td>{{ invoice.customerName }}</td>
+                            <td>{{ invoice.customer }}</td>
                             <td class="text-end">
                                 {{ invoice.netAmount|number_format(2, ',', ' ') }} zł
                             </td>

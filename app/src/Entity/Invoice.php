@@ -21,8 +21,13 @@ class Invoice
     #[ORM\Column(length: 50, unique: true)]
     private string $number ='';
 
-    #[ORM\Column(length: 255)]
-    private string $customerName ='';
+    #[ORM\ManyToOne(targetEntity: Customer::class)]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?Customer $customer = null;
+
+    #[ORM\ManyToOne(targetEntity: Project::class)]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?Project $project = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]
     private ?string $netAmount = null;
@@ -77,17 +82,6 @@ class Invoice
     public function setNumber(string $number): self
     {
         $this->number = $number;
-        return $this;
-    }
-
-    public function getCustomerName(): string
-    {
-        return $this->customerName;
-    }
-
-    public function setCustomerName(string $customerName): self
-    {
-        $this->customerName = $customerName;
         return $this;
     }
 
@@ -177,6 +171,28 @@ class Invoice
     {
         $this->person = $person;
 
+        return $this;
+    }
+
+    public function getCustomer(): ?Customer
+    {
+        return $this->customer;
+    }
+
+    public function setCustomer(?Customer $customer): static
+    {
+        $this->customer = $customer;
+        return $this;
+    }
+
+    public function getProject(): ?Project
+    {
+        return $this->project;
+    }
+
+    public function setProject(?Project $project): static
+    {
+        $this->project = $project;
         return $this;
     }
 }

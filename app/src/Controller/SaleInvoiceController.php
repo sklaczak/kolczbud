@@ -4,7 +4,9 @@ namespace App\Controller;
 
 use App\Entity\Invoice;
 use App\Enum\InvoiceType;
+use App\Repository\CustomerRepository;
 use App\Repository\InvoiceRepository;
+use App\Repository\ProjectRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,12 +25,16 @@ class SaleInvoiceController extends AbstractController
     }
 
     #[Route('/new', name: 'sale_invoice_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $em): Response
-    {
+    public function new(
+        Request $request,
+        EntityManagerInterface $em,
+        CustomerRepository $customerRepository,
+        ProjectRepository $projectRepository
+    ): Response {
         $invoice = new Invoice();
 
         if ($request->isMethod('POST')) {
-            $this->handleForm($invoice, $request);
+            $this->handleForm($invoice, $request, $customerRepository, $projectRepository);
             $em->persist($invoice);
             $em->flush();
 
@@ -39,14 +45,21 @@ class SaleInvoiceController extends AbstractController
         return $this->render('invoice/sale/form.html.twig', [
             'invoice' => $invoice,
             'mode' => 'create',
+            'customers' => $customerRepository->findAll(),
+            'projects'  => $projectRepository->findAll(),
         ]);
     }
 
     #[Route('/{id}/edit', name: 'sale_invoice_edit', methods: ['GET', 'POST'])]
-    public function edit(Invoice $invoice, Request $request, EntityManagerInterface $em): Response
-    {
+    public function edit(
+        Invoice $invoice,
+        Request $request,
+        EntityManagerInterface $em,
+        CustomerRepository $customerRepository,
+        ProjectRepository $projectRepository,
+    ): Response {
         if ($request->isMethod('POST')) {
-            $this->handleForm($invoice, $request);
+            $this->handleForm($invoice, $request, $customerRepository, $projectRepository);
             $em->flush();
 
             $this->addFlash('success', 'Faktura została zaktualizowana.');
@@ -56,6 +69,8 @@ class SaleInvoiceController extends AbstractController
         return $this->render('invoice/cost/form.html.twig', [
             'invoice' => $invoice,
             'mode' => 'edit',
+            'customers' => $customerRepository->findAll(),
+            'projects'  => $projectRepository->findAll(),
         ]);
     }
 
@@ -69,8 +84,12 @@ class SaleInvoiceController extends AbstractController
         return $this->redirectToRoute('sale_invoice_list');
     }
 
-private function handleForm(Invoice $invoice, Request $request): void
-{
+private function handleForm(
+    Invoice $invoice,
+    Request $request,
+    CustomerRepository $customerRepository,
+    ProjectRepository $projectRepository,
+): void {
     $number = $request->request->get('number');
     $customerName = $request->request->get('customerName');
     $amount = $request->request->get('amount');
@@ -89,6 +108,21 @@ private function handleForm(Invoice $invoice, Request $request): void
     $invoice->setGrossAmount($brutto);
     $invoice->setTaxAmount($vat);
     $invoice->setTaxRate($taxRate);
+
+    $customerId = $request->request->get('customerId');
+    $projectId  = $request->request->get('projectId');
+
+    $customer = null;
+    if ($customerId) {
+        $customer = $customerRepository->find($customerId);
+    }
+    $invoice->setCustomer($customer);
+
+    $project = null;
+    if ($projectId) {
+        $project = $projectRepository->find($projectId);
+    }
+    $invoice->setProject($project);
 
     $type = 'sale';
 

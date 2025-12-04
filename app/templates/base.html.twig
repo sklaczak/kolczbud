@@ -204,8 +204,9 @@
                     Ustawienia
                 </div>
                 <ul class="nav nav-pills flex-column">
+
                     <li class="nav-item">
-                        <a class="nav-link" href="#">
+                        <a class="nav-link disabled text-muted">
                             <i class="fa-solid fa-gear me-2"></i>
                             Ustawienia systemu
                         </a>
@@ -220,10 +221,34 @@
                     </li>
 
                     <li class="nav-item">
-                        <a class="nav-link {{ current_route == 'demo_customer_show' ? 'active' : '' }}"
-                           href="{{ path('demo_customer_show') }}">
+                        <a class="nav-link {{ current_route starts with 'customer_' ? 'active' : '' }}"
+                           href="{{ path('customer_list') }}">
                             <i class="fa-solid fa-building-user me-2"></i>
                             Kontrahenci
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link {{ current_route starts with 'project_' ? 'active' : '' }}"
+                           href="{{ path('project_list') }}">
+                            <i class="fa-solid fa-diagram-project me-2"></i>
+                            Projekty
+                        </a>
+                    </li>
+
+                    {# DEMO — zostawiam, ale uporządkowane i oznaczone #}
+                    <li class="nav-item mt-3">
+                        <a class="nav-link disabled text-muted">
+                            <i class="fa-solid fa-flask me-2"></i>
+                            Demo
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link {{ current_route == 'demo_customer_show' ? 'active' : '' }}"
+                           href="{{ path('demo_customer_show') }}">
+                            <i class="fa-solid fa-user-group me-2"></i>
+                            Kontrahenci (demo)
                         </a>
                     </li>
 
@@ -231,10 +256,12 @@
                         <a class="nav-link {{ current_route == 'demo_store_show' ? 'active' : '' }}"
                            href="{{ path('demo_store_show') }}">
                             <i class="fa-solid fa-store me-2"></i>
-                            Sklepy
+                            Sklepy (demo)
                         </a>
                     </li>
+
                 </ul>
+
             </div>
         </div>
 

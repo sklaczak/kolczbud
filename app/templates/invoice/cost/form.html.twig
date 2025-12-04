@@ -24,8 +24,30 @@
 
                 <div class="mb-3">
                     <label class="form-label">Kontrahent</label>
-                    <input type="text" name="customerName" class="form-control"
-                           value="{{ invoice.customerName ?? '' }}" required>
+                    <select name="customerId" id="customerId" class="form-select" required>
+                        <option value="">-- wybierz kontrahenta --</option>
+                        {% for customer in customers %}
+                            <option value="{{ customer.id }}"
+                                    {% if invoice.customer and invoice.customer.id == customer.id %}selected{% endif %}
+                            >
+                                {{ customer.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Projekt</label>
+                    <select name="projectId" id="projectId" class="form-select">
+                        <option value="">-- brak / nie dotyczy --</option>
+                        {% for project in projects %}
+                            <option value="{{ project.id }}"
+                                    {% if invoice.project and invoice.project.id == project.id %}selected{% endif %}
+                            >
+                                {{ project.name }} ({{ project.customer.name }})
+                            </option>
+                        {% endfor %}
+                    </select>
                 </div>
 
                 <div class="mb-3">

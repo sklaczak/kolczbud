@@ -28,6 +28,7 @@
                     <tr>
                         <th>Numer</th>
                         <th>Kontrahent</th>
+                        <th>Projekt</th>
                         <th>Dodana przez</th>
                         <th class="text-end">Kwota netto</th>
                         <th class="text-end">Kwota brutto</th>
@@ -42,7 +43,20 @@
                     {% for invoice in invoices %}
                         <tr>
                             <td>{{ invoice.number }}</td>
-                            <td>{{ invoice.customerName }}</td>
+                            <td>
+                                {% if invoice.customer %}
+                                    {{ invoice.customer.name }}
+                                {% else %}
+                                    <span class="text-muted">—</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if invoice.project %}
+                                    {{ invoice.project.name }}
+                                {% else %}
+                                    <span class="text-muted">—</span>
+                                {% endif %}
+                            </td>
                             <td>
                                 {% if invoice.person %}
                                     {{ invoice.person.fullName ?? invoice.person }}
