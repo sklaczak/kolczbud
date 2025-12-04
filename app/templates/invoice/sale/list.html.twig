@@ -28,7 +28,10 @@
                     <tr>
                         <th>Numer</th>
                         <th>Kontrahent</th>
-                        <th class="text-end">Kwota</th>
+                        <th class="text-end">Kwota netto</th>
+                        <th class="text-end">Kwota brutto</th>
+                        <th class="text-end">Podatek</th>
+                        <th class="text-end">Stawka VAT</th>
                         <th>Status</th>
                         <th>Wystawiona</th>
                         <th>Termin</th>
@@ -41,7 +44,16 @@
                             <td>{{ invoice.number }}</td>
                             <td>{{ invoice.customerName }}</td>
                             <td class="text-end">
-                                {{ invoice.amount|number_format(2, ',', ' ') }} zł
+                                {{ invoice.netAmount|number_format(2, ',', ' ') }} zł
+                            </td>
+                            <td class="text-end">
+                                {{ invoice.grossAmount|number_format(2, ',', ' ') }} zł
+                            </td>
+                            <td class="text-end">
+                                {{ invoice.taxAmount|number_format(2, ',', ' ') }} zł
+                            </td>
+                            <td class="text-end">
+                                {{ invoice.taxRate|number_format(2, ',', ' ') }}%
                             </td>
                             <td>
                                 {% if invoice.status == 'Opłacona' %}

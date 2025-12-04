@@ -69,7 +69,7 @@ class MobileCostInvoiceController extends AbstractController
         $invoice->setNumber('M' . ((new \DateTimeImmutable())->format('Y-m-d H:i:s')));
 
         // Kwota + opis
-        $invoice->setAmount($amount);
+        $invoice->setGrossAmount($amount);
         if (method_exists($invoice, 'setDescription')) {
             $invoice->setDescription($description);
         }

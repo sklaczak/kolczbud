@@ -24,8 +24,17 @@ class Invoice
     #[ORM\Column(length: 255)]
     private string $customerName ='';
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
-    private string $amount ='';
+    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]
+    private ?string $netAmount = null;
+
+    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]
+    private ?string $grossAmount = null;
+
+    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]
+    private ?string $taxAmount = null;
+
+    #[ORM\Column(type: Types::DECIMAL, precision: 5, scale: 2, nullable: true)]
+    private ?string $taxRate = null;
 
     #[ORM\Column(length: 30)]
     private string $status ='';
@@ -82,14 +91,47 @@ class Invoice
         return $this;
     }
 
-    public function getAmount(): string
+    public function getNetAmount(): ?string
     {
-        return $this->amount;
+        return $this->netAmount;
     }
 
-    public function setAmount(string $amount): self
+    public function setNetAmount(string $netAmount): self
     {
-        $this->amount = $amount;
+        $this->netAmount = $netAmount;
+        return $this;
+    }
+
+    public function getGrossAmount(): ?string
+    {
+        return $this->grossAmount;
+    }
+
+    public function setGrossAmount(string $grossAmount): self
+    {
+        $this->grossAmount = $grossAmount;
+        return $this;
+    }
+
+    public function getTaxAmount(): ?string
+    {
+        return $this->taxAmount;
+    }
+
+    public function setTaxAmount(string $taxAmount): self
+    {
+        $this->taxAmount = $taxAmount;
+        return $this;
+    }
+
+    public function getTaxRate(): ?string
+    {
+        return $this->taxRate;
+    }
+
+    public function setTaxRate(string $taxRate): self
+    {
+        $this->taxRate = $taxRate;
         return $this;
     }
 

@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Invoice;
+use App\Enum\InvoiceType;
 use App\Repository\InvoiceRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -32,7 +33,7 @@ class SaleInvoiceController extends AbstractController
             $em->flush();
 
             $this->addFlash('success', 'Faktura została dodana.');
-            return $this->redirectToRoute('invoice_list');
+            return $this->redirectToRoute('sale_invoice_list');
         }
 
         return $this->render('invoice/sale/form.html.twig', [
@@ -65,37 +66,44 @@ class SaleInvoiceController extends AbstractController
         $em->flush();
 
         $this->addFlash('success', 'Faktura została usunięta.');
-        return $this->redirectToRoute('invoice_list');
+        return $this->redirectToRoute('sale_invoice_list');
     }
 
-    private function handleForm(Invoice $invoice, Request $request): void
-    {
-        $number = $request->request->get('number');
-        $customerName = $request->request->get('customerName');
-        $amount = $request->request->get('amount');
-        $status = $request->request->get('status');
-        $issuedAt = $request->request->get('issuedAt');
-        $dueDate = $request->request->get('dueDate');
+private function handleForm(Invoice $invoice, Request $request): void
+{
+    $number = $request->request->get('number');
+    $customerName = $request->request->get('customerName');
+    $amount = $request->request->get('amount');
+    $status = $request->request->get('status');
+    $issuedAt = $request->request->get('issuedAt');
+    $dueDate = $request->request->get('dueDate');
+    $netto = $request->request->get('netAmount');
+    $brutto = $request->request->get('grossAmount');
+    $vat = $request->request->get('taxAmount');
+    $taxRate = $request->request->get('taxRate');
 
-        $invoice->setNumber($number);
-        $invoice->setCustomerName($customerName);
-        $invoice->setAmount($amount);
-        $invoice->setStatus($status);
+    $invoice->setNumber($number);
+    $invoice->setCustomerName($customerName);
+    $invoice->setStatus($status);
+    $invoice->setNetAmount($netto);
+    $invoice->setGrossAmount($brutto);
+    $invoice->setTaxAmount($vat);
+    $invoice->setTaxRate($taxRate);
 
-        $type = $request->request->get('type');
+    $type = 'sale';
 
-        if ($type && in_array($type, ['sale', 'cost'], true)) {
-            $invoice->setType(InvoiceType::from($type));
-        }
+    if ($type && in_array($type, ['sale', 'cost'], true)) {
+        $invoice->setType(InvoiceType::from($type));
+    }
 
-        $issuedAtDate = \DateTimeImmutable::createFromFormat('Y-m-d', $issuedAt) ?: new \DateTimeImmutable();
-        $invoice->setIssuedAt($issuedAtDate);
+    $issuedAtDate = \DateTimeImmutable::createFromFormat('Y-m-d', $issuedAt) ?: new \DateTimeImmutable();
+    $invoice->setIssuedAt($issuedAtDate);
 
-        if ($dueDate) {
-            $dueDateDate = \DateTimeImmutable::createFromFormat('Y-m-d', $dueDate);
-            $invoice->setDueDate($dueDateDate ?: null);
-        } else {
-            $invoice->setDueDate(null);
-        }
+    if ($dueDate) {
+        $dueDateDate = \DateTimeImmutable::createFromFormat('Y-m-d', $dueDate);
+        $invoice->setDueDate($dueDateDate ?: null);
+    } else {
+        $invoice->setDueDate(null);
+    }
     }
 }

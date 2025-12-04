@@ -80,8 +80,15 @@ class CostInvoiceController extends AbstractController
 
         $invoice->setNumber($number);
         $invoice->setCustomerName($customerName);
-        $invoice->setAmount($amount);
+        $netto = $request->request->get('netAmount');
+        $brutto = $request->request->get('grossAmount');
+        $vat = $request->request->get('taxAmount');
+        $taxRate = $request->request->get('taxRate');
         $invoice->setStatus($status);
+        $invoice->setNetAmount($netto);
+        $invoice->setGrossAmount($brutto);
+        $invoice->setTaxAmount($vat);
+        $invoice->setTaxRate($taxRate);
 
         $type = 'cost';
 

@@ -28,10 +28,13 @@
                     <tr>
                         <th>Numer</th>
                         <th>Kontrahent</th>
-                        <th class="text-end">Kwota</th>
+                        <th>Dodana przez</th>
+                        <th class="text-end">Kwota netto</th>
+                        <th class="text-end">Kwota brutto</th>
+                        <th class="text-end">Podatek</th>
+                        <th class="text-end">Stawka VAT</th>
                         <th>Status</th>
-                        <th>Wystawiona</th>
-                        <th>Termin</th>
+                        <th>Dodano</th>
                         <th style="width: 160px;">Akcje</th>
                     </tr>
                     </thead>
@@ -40,8 +43,24 @@
                         <tr>
                             <td>{{ invoice.number }}</td>
                             <td>{{ invoice.customerName }}</td>
+                            <td>
+                                {% if invoice.person %}
+                                    {{ invoice.person.fullName ?? invoice.person }}
+                                {% else %}
+                                    <span class="text-muted">—</span>
+                                {% endif %}
+                            </td>
                             <td class="text-end">
-                                {{ invoice.amount|number_format(2, ',', ' ') }} zł
+                                {{ invoice.netAmount|number_format(2, ',', ' ') }} zł
+                            </td>
+                            <td class="text-end">
+                                {{ invoice.grossAmount|number_format(2, ',', ' ') }} zł
+                            </td>
+                            <td class="text-end">
+                                {{ invoice.taxAmount|number_format(2, ',', ' ') }} zł
+                            </td>
+                            <td class="text-end">
+                                {{ invoice.taxRate|number_format(2, ',', ' ') }}%
                             </td>
                             <td>
                                 {% if invoice.status == 'Opłacona' %}
@@ -53,9 +72,6 @@
                                 {% endif %}
                             </td>
                             <td>{{ invoice.issuedAt|date('Y-m-d') }}</td>
-                            <td>
-                                {{ invoice.dueDate ? invoice.dueDate|date('Y-m-d') : '-' }}
-                            </td>
                             <td>
                                 <a href="{{ path('cost_invoice_edit', {id: invoice.id}) }}"
                                    class="btn btn-sm btn-outline-primary">

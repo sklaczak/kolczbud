@@ -41,7 +41,7 @@
                             <td>{{ invoice.number }}</td>
                             <td>{{ invoice.customerName }}</td>
                             <td class="text-end">
-                                {{ invoice.amount|number_format(2, ',', ' ') }} zł
+                                {{ invoice.netAmount|number_format(2, ',', ' ') }} zł
                             </td>
                             <td>
                                 {% if invoice.status == 'Opłacona' %}
