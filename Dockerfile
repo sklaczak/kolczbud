@@ -15,10 +15,15 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html
 
-# 🔹 KOPIUJEMY CAŁĄ APLIKACJĘ (app/) DO OBRAZU
+# USTAWIAMY ENV PRZED composer install
+ENV APP_ENV=prod
+ENV APP_DEBUG=0
+ENV COMPOSER_ALLOW_SUPERUSER=1
+
+# Kopiujemy aplikację
 COPY app/ ./
 
-# 🔹 TERAZ bin/console JUŻ ISTNIEJE → composer może odpalić cache:clear
+# Teraz composer odpali cache:clear w APP_ENV=prod
 RUN composer install \
     --no-dev \
     --optimize-autoloader \
@@ -28,8 +33,5 @@ RUN composer install \
 RUN sed -ri 's!/var/www/html!/var/www/html/public!g' /etc/apache2/sites-available/000-default.conf \
  && sed -ri 's!/var/www/!/var/www/html/public!g' /etc/apache2/apache2.conf \
  && a2enmod rewrite
-
-ENV APP_ENV=prod
-ENV APP_DEBUG=0
 
 CMD ["apache2-foreground"]
