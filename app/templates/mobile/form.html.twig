@@ -39,12 +39,23 @@
                 <label for="paymentMethodId" class="form-label">Forma płatności</label>
                 <select id="paymentMethodId" name="paymentMethodId" class="form-select" required>
                     <option value="">-- wybierz --</option>
+
+                    {% set isCreate = mode is defined and mode == 'create' %}
+                    {% set hasPaymentMethod = invoice.paymentMethod is defined and invoice.paymentMethod %}
+
                     {% for method in paymentMethods %}
-                        <option value="{{ method.id }}"
-                            {% if invoice.paymentMethod is defined and invoice.paymentMethod and invoice.paymentMethod.id == method.id %}
-                                selected
-                            {% endif %}
-                        >
+                        {% set isSelected = false %}
+
+                        {# 1. Edycja – zawsze bierzemy to, co jest w encji #}
+                        {% if hasPaymentMethod and invoice.paymentMethod.id == method.id %}
+                            {% set isSelected = true %}
+
+                            {# 2. Tworzenie – jeśli brak przypisanej metody, wybierz domyślną #}
+                        {% elseif isCreate and not hasPaymentMethod and method.default %}
+                            {% set isSelected = true %}
+                        {% endif %}
+
+                        <option value="{{ method.id }}" {% if isSelected %}selected{% endif %}>
                             {{ method.name }}
                         </option>
                     {% endfor %}

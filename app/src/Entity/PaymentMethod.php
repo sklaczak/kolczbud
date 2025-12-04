@@ -16,6 +16,9 @@ class PaymentMethod
     #[ORM\Column(length: 100)]
     private ?string $name = null;
 
+    #[ORM\Column(type: 'boolean', options: ['default' => false])]
+    private bool $isDefault = false;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -29,6 +32,17 @@ class PaymentMethod
     public function setName(string $name): static
     {
         $this->name = $name;
+        return $this;
+    }
+
+    public function isDefault(): bool
+    {
+        return $this->isDefault;
+    }
+
+    public function setIsDefault(bool $isDefault): static
+    {
+        $this->isDefault = $isDefault;
         return $this;
     }
 

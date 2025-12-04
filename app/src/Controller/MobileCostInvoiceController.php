@@ -48,7 +48,7 @@ class MobileCostInvoiceController extends AbstractController
             'invoice'         => $invoice,
             'mode'            => 'create',
             'people'          => $personRepo->findAll(),
-            'paymentMethods'  => $paymentMethodRepo->findAll(),
+            'paymentMethods'  => $paymentMethodRepo->findAllOrderedByDefault(),
         ]);
     }
 

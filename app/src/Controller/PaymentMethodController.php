@@ -22,14 +22,22 @@ class PaymentMethodController extends AbstractController
     }
 
     #[Route('/new', name: 'payment_method_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $em): Response
-    {
+    public function new(
+        Request $request,
+        EntityManagerInterface $em,
+        PaymentMethodRepository $paymentMethodRepository,
+    ): Response {
         $paymentMethod = new PaymentMethod();
 
         if ($request->isMethod('POST')) {
             $this->handleForm($paymentMethod, $request);
 
             $em->persist($paymentMethod);
+
+            if ($paymentMethod->isDefault()) {
+                $paymentMethodRepository->unsetDefaultForOthers($paymentMethod);
+            }
+
             $em->flush();
 
             $this->addFlash('success', 'Forma płatności została dodana.');
@@ -43,10 +51,18 @@ class PaymentMethodController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'payment_method_edit', methods: ['GET', 'POST'])]
-    public function edit(PaymentMethod $paymentMethod, Request $request, EntityManagerInterface $em): Response
-    {
+    public function edit(
+        PaymentMethod $paymentMethod,
+        Request $request,
+        EntityManagerInterface $em,
+        PaymentMethodRepository $paymentMethodRepository,
+    ): Response {
         if ($request->isMethod('POST')) {
             $this->handleForm($paymentMethod, $request);
+
+            if ($paymentMethod->isDefault()) {
+                $paymentMethodRepository->unsetDefaultForOthers($paymentMethod);
+            }
 
             $em->flush();
 
@@ -73,7 +89,9 @@ class PaymentMethodController extends AbstractController
     private function handleForm(PaymentMethod $paymentMethod, Request $request): void
     {
         $name = $request->request->get('name');
+        $isDefault = (bool) $request->request->get('isDefault', false);
 
         $paymentMethod->setName($name);
+        $paymentMethod->setIsDefault($isDefault);
     }
 }
