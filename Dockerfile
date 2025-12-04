@@ -44,7 +44,7 @@ RUN sed -ri 's!/var/www/html!/var/www/html/public!g' /etc/apache2/sites-availabl
         AllowOverride All\n\
         Require all granted\n\
         AuthType Basic\n\
-        AuthName \"Restricted Area\"\n\
+        AuthName "Restricted Area"\n\
         AuthUserFile /etc/apache2/.htpasswd\n\
         Require valid-user\n\
     </Directory>\n' > /etc/apache2/conf-available/symfony.conf \
