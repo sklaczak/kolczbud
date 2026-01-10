@@ -40,6 +40,11 @@ COPY docker/apache/.htpasswd /etc/apache2/.htpasswd
 RUN sed -ri 's!/var/www/html!/var/www/html/public!g' /etc/apache2/sites-available/000-default.conf \
     && a2enmod rewrite \
     && a2enmod auth_basic \
+    \
+    # FIX: tylko jeden MPM (php:*-apache = mod_php => prefork)
+    && a2dismod mpm_event mpm_worker || true \
+    && a2enmod mpm_prefork \
+    \
     && printf '<Directory /var/www/html/public>\n\
         AllowOverride All\n\
         Require all granted\n\
