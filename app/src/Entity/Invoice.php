@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Enum\InvoiceType;
+use App\Person\Domain\Entity\Person;
 use App\Repository\InvoiceRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;

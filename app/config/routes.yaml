@@ -9,3 +9,11 @@
 
 controllers:
     resource: routing.controllers
+
+person_controllers:
+    resource: ../src/Person/UI/Http/
+    type: attribute
+
+identity_controllers:
+    resource: ../src/Identity/UI/Http/
+    type: attribute

@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Enum\UninvoicedPurchaseStatus;
+use App\Person\Domain\Entity\Person;
 use App\Repository\UninvoicedPurchaseRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
