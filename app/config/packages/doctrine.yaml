@@ -24,6 +24,18 @@ doctrine:
                 dir: '%kernel.project_dir%/src/Entity'
                 prefix: 'App\Entity'
                 alias: App
+            AppPerson:
+                is_bundle: false
+                type: attribute
+                dir: '%kernel.project_dir%/src/Person/Domain/Entity'
+                prefix: 'App\Person\Domain\Entity'
+                alias: AppPerson
+            Identity:
+                is_bundle: false
+                type: attribute
+                dir: '%kernel.project_dir%/src/Identity/Domain/Entity'
+                prefix: 'App\Identity\Domain\Entity'
+                alias: Identity
         controller_resolver:
             auto_mapping: false
 

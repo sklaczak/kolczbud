@@ -21,3 +21,41 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+    # Port -> adapter (write repo)
+    App\Person\Domain\Repository\PersonRepository:
+        class: App\Person\Infrastructure\Doctrine\DoctrinePersonRepository
+        autowire: true
+
+    # Shared buses (wrappery na Messenger)
+    App\Shared\Application\Bus\CommandBus:
+        class: App\Shared\Infrastructure\Bus\MessengerCommandBus
+        arguments: ['@messenger.bus.default']
+        autowire: true
+
+    App\Shared\Application\Bus\QueryBus:
+        class: App\Shared\Infrastructure\Bus\MessengerQueryBus
+        arguments: ['@messenger.bus.default']
+        autowire: true
+
+
+    # Ports -> adapters
+    App\Identity\Domain\Repository\UserAccountRepository:
+        class: App\Identity\Infrastructure\Doctrine\DoctrineUserAccountRepository
+        autowire: true
+
+    App\Identity\Domain\Repository\AuthMethodRepository:
+        class: App\Identity\Infrastructure\Doctrine\DoctrineAuthMethodRepository
+        autowire: true
+
+    App\Identity\Domain\Repository\PasswordCredentialRepository:
+        class: App\Identity\Infrastructure\Doctrine\DoctrinePasswordCredentialRepository
+        autowire: true
+
+    App\Identity\Application\Port\PersonLookup:
+        class: App\Identity\Infrastructure\Person\DbalPersonLookup
+        autowire: true
+
+    App\Identity\Infrastructure\Security\GoogleOidcClient:
+        arguments:
+            $googleClientId: '%env(GOOGLE_OAUTH_CLIENT_ID)%'
