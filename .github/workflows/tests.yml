@@ -3,7 +3,7 @@ name: Tests
 on:
     pull_request:
     push:
-        branches: [ master ]
+        branches: [ master, main ]
 
 jobs:
     test:
@@ -26,7 +26,8 @@ jobs:
 
         env:
             APP_ENV: test
-            DATABASE_URL: "pgsql://symfony:symfony@127.0.0.1:5432/kolczbud?serverVersion=16&charset=utf8"
+            APP_DEBUG: "0"
+            DATABASE_URL: "postgresql://symfony:symfony@127.0.0.1:5432/kolczbud?serverVersion=16&charset=utf8"
 
         steps:
             - uses: actions/checkout@v4
@@ -37,21 +38,44 @@ jobs:
                   php-version: "8.3"
                   tools: composer
                   coverage: none
+                  extensions: intl, pdo_pgsql, zip
+
+            - name: Get Composer cache dir
+              id: composer-cache
+              working-directory: app
+              run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+            - name: Cache Composer
+              uses: actions/cache@v4
+              with:
+                  path: ${{ steps.composer-cache.outputs.dir }}
+                  key: ${{ runner.os }}-composer-${{ hashFiles('app/composer.lock') }}
+                  restore-keys: |
+                      ${{ runner.os }}-composer-
 
             - name: Validate composer.json
+              working-directory: app
               run: composer validate --no-interaction
 
             - name: Install dependencies
+              working-directory: app
               run: composer install --no-interaction --prefer-dist
 
-            # (opcjonalnie) jeśli masz migracje i testy wymagają schematu:
-            - name: Migrate DB (if needed)
+            - name: Wait for DB
               run: |
-                  if [ -f bin/console ]; then
-                    php bin/console doctrine:migrations:migrate --no-interaction || true
-                  fi
+                  for i in {1..30}; do
+                    pg_isready -h 127.0.0.1 -p 5432 -U symfony -d kolczbud && exit 0
+                    sleep 1
+                  done
+                  echo "Postgres not ready"
+                  exit 1
 
-            - name: Run PHPUnit
+            - name: Run migrations
+              working-directory: app
+              run: php bin/console doctrine:migrations:migrate --no-interaction
+
+            - name: Run tests
+              working-directory: app
               run: |
                   if [ -f vendor/bin/phpunit ]; then
                     vendor/bin/phpunit
