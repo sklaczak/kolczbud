@@ -1,0 +1,60 @@
+name: Tests
+
+on:
+    pull_request:
+    push:
+        branches: [ master ]
+
+jobs:
+    test:
+        runs-on: ubuntu-latest
+
+        services:
+            postgres:
+                image: postgres:16
+                env:
+                    POSTGRES_DB: kolczbud
+                    POSTGRES_USER: symfony
+                    POSTGRES_PASSWORD: symfony
+                ports:
+                    - 5432:5432
+                options: >-
+                    --health-cmd="pg_isready -U symfony -d kolczbud"
+                    --health-interval=10s
+                    --health-timeout=5s
+                    --health-retries=10
+
+        env:
+            APP_ENV: test
+            DATABASE_URL: "pgsql://symfony:symfony@127.0.0.1:5432/kolczbud?serverVersion=16&charset=utf8"
+
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Setup PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: "8.3"
+                  tools: composer
+                  coverage: none
+
+            - name: Validate composer.json
+              run: composer validate --no-interaction
+
+            - name: Install dependencies
+              run: composer install --no-interaction --prefer-dist
+
+            # (opcjonalnie) jeśli masz migracje i testy wymagają schematu:
+            - name: Migrate DB (if needed)
+              run: |
+                  if [ -f bin/console ]; then
+                    php bin/console doctrine:migrations:migrate --no-interaction || true
+                  fi
+
+            - name: Run PHPUnit
+              run: |
+                  if [ -f vendor/bin/phpunit ]; then
+                    vendor/bin/phpunit
+                  else
+                    php bin/phpunit
+                  fi
