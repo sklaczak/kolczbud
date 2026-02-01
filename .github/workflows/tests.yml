@@ -3,7 +3,7 @@ name: Tests
 on:
     pull_request:
     push:
-        branches: [ main ]
+        branches: [ master ]
 
 jobs:
     test:
@@ -11,34 +11,50 @@ jobs:
 
         services:
             postgres:
-                image: postgres:14
+                image: postgres:16
                 env:
-                    POSTGRES_USER: postgres
-                    POSTGRES_PASSWORD: postgres
-                    POSTGRES_DB: condo
+                    POSTGRES_DB: kolczbud
+                    POSTGRES_USER: symfony
+                    POSTGRES_PASSWORD: symfony
                 ports:
                     - 5432:5432
                 options: >-
-                    --health-cmd="pg_isready"
+                    --health-cmd="pg_isready -U symfony -d kolczbud"
                     --health-interval=10s
                     --health-timeout=5s
-                    --health-retries=5
+                    --health-retries=10
+
+        env:
+            APP_ENV: test
+            DATABASE_URL: "pgsql://symfony:symfony@127.0.0.1:5432/kolczbud?serverVersion=16&charset=utf8"
 
         steps:
             - uses: actions/checkout@v4
 
-            - uses: actions/setup-node@v4
+            - name: Setup PHP
+              uses: shivammathur/setup-php@v2
               with:
-                  node-version: 18
-                  cache: 'yarn'
+                  php-version: "8.3"
+                  tools: composer
+                  coverage: none
 
-            - name: Install deps
-              run: yarn install --frozen-lockfile
+            - name: Validate composer.json
+              run: composer validate --no-interaction
 
-            - name: Run migrations
-              run: yarn workspace @open-condo/keystone migrate
-              env:
-                  DATABASE_URL: postgres://postgres:postgres@localhost:5432/condo
+            - name: Install dependencies
+              run: composer install --no-interaction --prefer-dist
 
-            - name: Run tests
-              run: yarn test
+            # (opcjonalnie) jeśli masz migracje i testy wymagają schematu:
+            - name: Migrate DB (if needed)
+              run: |
+                  if [ -f bin/console ]; then
+                    php bin/console doctrine:migrations:migrate --no-interaction || true
+                  fi
+
+            - name: Run PHPUnit
+              run: |
+                  if [ -f vendor/bin/phpunit ]; then
+                    vendor/bin/phpunit
+                  else
+                    php bin/phpunit
+                  fi
